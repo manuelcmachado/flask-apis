@@ -5,7 +5,7 @@
     @author: Manuel Machado
     @version: 0.0.1
 
-    Description: The purpose of this program is to display a simple "Hello World" message from a web server
+    Description: The purpose of this program is to display a simple "Hello World" message from a web browser
                  using python's web microservice Flask.
 
 """
