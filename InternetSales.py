@@ -1,5 +1,5 @@
 """
-    Creation date: 2020-04-12 13:43:17
+    Creation date: 2022-06-11 13:43:17
     Tampa, FL
 
     @author: Manuel Machado
@@ -13,7 +13,6 @@
 import datetime
 import decimal
 import json
-import xmltodict
 import pandas as pd
 
 from flask import Flask
@@ -44,8 +43,8 @@ def database_connection():
     return dbConnectionInstance.getTrustedConnection(), sqlQuery
 
 
-# list of sequence of dictionaries
-@application.route('/api/internetsales/listofdicts/json', methods=['GET'])
+# In this endpoint, we use Pandas and its function to_jason to Serialize an object to a JSON formatted str
+@application.route('/api/internetsales/pandas/json', methods=['GET'])
 def internetSalesJson():
     connection, query = database_connection()
     df = pd.read_sql(query, connection)
@@ -53,8 +52,8 @@ def internetSalesJson():
     return df.to_json(date_format='iso', indent=2, orient='records')
 
 
-# dictionary of sequence of dictionaries
-@application.route('/api/internetsales/dictofdicts/json', methods=['GET'])
+# In this endpoint, we use Python json module and its function dumps to Serialize an object to a JSON formatted str
+@application.route('/api/internetsales/dumps/json', methods=['GET'])
 def internetSalesJsonDict():
     connection, query = database_connection()
     cursor = connection.cursor()
@@ -69,8 +68,6 @@ def internetSalesJsonDict():
     cursor.close()
     connection.close()
     return dictTextEncoded
-
-# to do: write a method to handle an xml endpoint
 
 
 if __name__ == '__main__':
