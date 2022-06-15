@@ -3,7 +3,7 @@
     Tampa, FL
 
     @author: Manuel Machado
-    @version: 0.0.1
+    @version: 0.0.2
 
     Description: The purpose of this program is to create an API using python's web microservice Flask.
                  This particular API will provide a data set in form of a json and xml file. It ingests the data from
