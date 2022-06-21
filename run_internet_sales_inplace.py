@@ -14,22 +14,23 @@
 # I should rather do this an accessible module that handles the same data but it's not an API
 
 
-import datetime
-import decimal
+from datetime import datetime, date
+from decimal import Decimal
 import json
 import pandas as pd
 
-import DatabaseConnection as dbc
+import database_connection as dbc
 
 import configparser
 
 
 # helper function. Handles date, and float data types.
-def dateTimeHandler(obj):
-    if isinstance(obj, datetime.datetime):
+def date_time_handler(obj):
+    if isinstance(obj, (datetime, date)):
         return obj.isoformat()
-    elif isinstance(obj, decimal.Decimal):
-        return float(obj)
+    elif isinstance(obj, Decimal):
+        return obj.__float__()
+    raise TypeError(f'Type {obj} no serializable')
 
 
 def getInternetSalesPandas(connection, query):
@@ -46,7 +47,7 @@ def getInternetSalesZipDict(connection, query):
     for row in dbData.fetchall():
         rowsFromCursor.append(dict(zip(columns, row)))
 
-    dictTextEncoded = json.dumps(rowsFromCursor, default=dateTimeHandler, sort_keys=False, indent=2)
+    dictTextEncoded = json.dumps(rowsFromCursor, default=date_time_handler, sort_keys=False, indent=2)
     cursor.close()
     return dictTextEncoded
 
@@ -61,12 +62,12 @@ if __name__ == '__main__':
     sqlQuery = parser.get('Database', 'sql_query')
 
     dbConnectionInstance = dbc.DataBaseConnection(server=serverName, database=databaseName)
-    dbConnection = dbConnectionInstance.getTrustedConnection()
+    dbConnection = dbConnectionInstance.get_trusted_connection()
 
-    jsonData = getInternetSalesPandas(dbConnection, sqlQuery)
-    print(jsonData)
-    dbConnection.close()
-
-    #jsonData = getInternetSalesZipDict(dbConnection, sqlQuery)
+    #jsonData = getInternetSalesPandas(dbConnection, sqlQuery)
     #print(jsonData)
     #dbConnection.close()
+
+    jsonData = getInternetSalesZipDict(dbConnection, sqlQuery)
+    print(jsonData)
+    dbConnection.close()

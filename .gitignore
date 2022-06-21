@@ -1,6 +1,6 @@
 /flaskconfig.conf
 /createconfigfile.py
-/TestInternetSales.py
+/run_internet_sales_inplace.py
 /.gitignore
 /.idea
 /.ipynb_checkpoints

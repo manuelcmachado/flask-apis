@@ -6,18 +6,18 @@
     @version: 0.0.2
 
     Description: The purpose of this program is to create an API using python's web microservice Flask.
-                 This particular API will provide a data set in form of a json and xml file. It ingests the data from
-                 a SQL Server Database via stored procedure using an ODBC connection.
+                 The endpoints in this particular API serializes data to json file format. It ingests data from
+                 a SQL Server Database via, stored procedure using an ODBC connection.
 """
 
-import datetime
-import decimal
+from datetime import datetime, date
+from decimal import Decimal
 import json
 import pandas as pd
 
 from flask import Flask
 
-import DatabaseConnection as dbc
+import database_connection as dbc
 import configparser
 
 
@@ -25,11 +25,12 @@ application = Flask(__name__)
 
 
 # Helper function to handle time and float data types during the json serialization
-def dateTimeHandler(obj):
-    if isinstance(obj, datetime.datetime):
+def date_time_handler(obj):
+    if isinstance(obj, (datetime, date)):
         return obj.isoformat()
-    elif isinstance(obj, decimal.Decimal):
+    elif isinstance(obj, Decimal):
         return obj.__float__()
+    raise TypeError(f'Type {obj} no serializable')
 
 
 def database_connection():
@@ -40,21 +41,25 @@ def database_connection():
     sqlQuery = parser.get('Database', 'sql_query')
 
     dbConnectionInstance = dbc.DataBaseConnection(server=serverName, database=databaseName)
-    return dbConnectionInstance.getTrustedConnection(), sqlQuery
+    return dbConnectionInstance.get_trusted_connection(), sqlQuery
 
 
-# In this endpoint, we use Pandas and its function to_jason to Serialize an object to a JSON formatted str
 @application.route('/api/internetsales/pandas/json', methods=['GET'])
-def internetSalesJson():
+def internet_sales_pandas():
+    """ This method serializes an object to a JSON formatted string using the Pandas library.
+        :returns -- A serialized object to a json formatted string
+        """
     connection, query = database_connection()
     df = pd.read_sql(query, connection)
     connection.close()
     return df.to_json(date_format='iso', indent=2, orient='records')
 
 
-# In this endpoint, we use Python json module and its function dumps to Serialize an object to a JSON formatted str
 @application.route('/api/internetsales/dumps/json', methods=['GET'])
-def internetSalesJsonDict():
+def internet_sales_dumps():
+    """ This method serializes an object to a JSON formatted string using the Python native json module.
+        :returns -- A serialized object to a json formatted string
+    """
     connection, query = database_connection()
     cursor = connection.cursor()
     dbData = cursor.execute(query)
@@ -64,7 +69,7 @@ def internetSalesJsonDict():
     for row in dbData.fetchall():
         rowsFromCursor.append(dict(zip(columns, row)))
 
-    dictTextEncoded = json.dumps(rowsFromCursor, default=dateTimeHandler, sort_keys=False, indent=2)
+    dictTextEncoded = json.dumps(rowsFromCursor, default=date_time_handler, sort_keys=False, indent=2)
     cursor.close()
     connection.close()
     return dictTextEncoded

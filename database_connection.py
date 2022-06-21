@@ -6,8 +6,10 @@
     @version: 0.0.1
 
     Description: The purpose of this class is to connect to a Microsoft SQL Server Relational Database.
-                 This particular class has two methods which may be used according to the platform being used: Windows
-                 or UNIX/LINUX.
+                 This particular class has two methods which may be used according to the connection type.
+                 typically, in a Windows OS, both connections types may be used, while in a Linux/UNIX OS the login
+                 credentials (user, and password) should be supplied.
+
 """
 import pyodbc
 
@@ -18,7 +20,7 @@ class DataBaseConnection:
         self.server = server
         self.database = database
 
-    def getTrustedConnection(self) -> pyodbc.Connection:
+    def get_trusted_connection(self) -> pyodbc.Connection:
         """ This method implements a trusted connection to a MSSQL Server Database instance.
             :returns -- A Database connection object
         """
@@ -30,7 +32,7 @@ class DataBaseConnection:
                             ) as connection:
             return connection
 
-    def getConnection(self, user_id, user_pwd):
+    def get_connection(self, user_id, user_pwd):
         """ This method implements a non-trusted connection to a MSSQL Server Database instance.
             :param user_id The user id for connecting to the RDBMS
             :param user_pwd he password to login into the RDBMS
