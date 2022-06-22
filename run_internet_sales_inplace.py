@@ -11,8 +11,6 @@
 
 """
 
-# I should rather do this an accessible module that handles the same data but it's not an API
-
 
 from datetime import datetime, date
 from decimal import Decimal
@@ -64,6 +62,7 @@ if __name__ == '__main__':
     dbConnectionInstance = dbc.DataBaseConnection(server=serverName, database=databaseName)
     dbConnection = dbConnectionInstance.get_trusted_connection()
 
+    # Uncomment the code below to test the getInternetSalesPandas function
     #jsonData = getInternetSalesPandas(dbConnection, sqlQuery)
     #print(jsonData)
     #dbConnection.close()
