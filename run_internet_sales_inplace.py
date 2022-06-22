@@ -50,7 +50,6 @@ def getInternetSalesZipDict(connection, query):
     return dictTextEncoded
 
 
-# for testing on a non trusted connection, implement a config file where the program can read the credentials
 if __name__ == '__main__':
 
     parser = configparser.ConfigParser()
