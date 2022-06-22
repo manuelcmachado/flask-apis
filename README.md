@@ -1,4 +1,4 @@
 # flask-apis
 API Development with Flask
 
-"start_internet_sales.py" is the Flask Application starting point. By running this file it will lounch the server. If you want to test the app before lauching the server, run "run_internet_sales_inplace.py" file 
+The start_internet_sales.py file, is the Flask Application's starting point. By running it, a server instance is launched, and you can consume each endpoint's content. If you want to test the app before launching the server, run **run_internet_sales_inplace.py** file and you'll get what an endpoint would deliver. 
