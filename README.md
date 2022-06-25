@@ -10,3 +10,9 @@ The start_internet_sales.py file, is the Flask Application's starting point. By 
 - hello_world.py: Running this file, the classic "Hello World" message is rendered in a Web Browser. This a very basic Flask app.
 - run_internet_sales_inplace.py: If you want to test the app before launching the server, run this.
 - start_internet_sales.py: This is the app's starting point.  
+
+## Running the Flask app
+
+As mentioned above, run the script start_internet_sales.py and you have your Flask app up and running as depicted below:
+
+
