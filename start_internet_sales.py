@@ -20,6 +20,8 @@ from flask import Flask
 import database_connection as dbc
 import configparser
 
+import platform
+
 
 application = Flask(__name__)
 
@@ -33,7 +35,20 @@ def date_time_handler(obj):
     raise TypeError(f'Type {obj} no serializable')
 
 
-def database_connection():
+def database_untrusted_connection():
+    parser = configparser.ConfigParser()
+    parser.read('flaskconfig.conf')
+    serverName = parser.get('Database', 'server_name')
+    databaseName = parser.get('Database', 'database_name')
+    sqlQuery = parser.get('Database', 'sql_query')
+    pwd = parser.get('Database', 'user_pwd')
+    user = parser.get('Database', 'user_id')
+
+    dbConnectionInstance = dbc.DataBaseConnection(server=serverName, database=databaseName)
+    return dbConnectionInstance.get_connection(user_id=user, user_pwd=pwd), sqlQuery
+
+
+def database_trusted_connection():
     parser = configparser.ConfigParser()
     parser.read('flaskconfig.conf')
     serverName = parser.get('Database', 'server_name')
@@ -49,10 +64,16 @@ def internet_sales_pandas():
     """ This method serializes an object to a JSON formatted string using the Pandas library.
         :returns -- A serialized object to a json formatted string
         """
-    connection, query = database_connection()
-    df = pd.read_sql(query, connection)
-    connection.close()
-    return df.to_json(date_format='iso', indent=2, orient='records')
+    if platform.system() == 'Windows':
+        connection, query = database_trusted_connection()
+        df = pd.read_sql(query, connection)
+        connection.close()
+        return df.to_json(date_format='iso', indent=2, orient='records')
+    elif platform.system() == 'Linux':
+        connection, query = database_untrusted_connection()
+        df = pd.read_sql(query, connection)
+        connection.close()
+        return df.to_json(date_format='iso', indent=2, orient='records')
 
 
 @application.route('/api/internetsales/dumps/json', methods=['GET'])
@@ -60,11 +81,18 @@ def internet_sales_dumps():
     """ This method serializes an object to a JSON formatted string using the Python native json module.
         :returns -- A serialized object to a json formatted string
     """
-    connection, query = database_connection()
-    cursor = connection.cursor()
-    dbData = cursor.execute(query)
-    columns = [column[0] for column in cursor.description]
-    rowsFromCursor = []
+    if platform.system() == 'Windows':
+        connection, query = database_trusted_connection()
+        cursor = connection.cursor()
+        dbData = cursor.execute(query)
+        columns = [column[0] for column in cursor.description]
+        rowsFromCursor = []
+    elif platform.system() == 'Linux':
+        connection, query = database_untrusted_connection()
+        cursor = connection.cursor()
+        dbData = cursor.execute(query)
+        columns = [column[0] for column in cursor.description]
+        rowsFromCursor = []
 
     for row in dbData.fetchall():
         rowsFromCursor.append(dict(zip(columns, row)))
